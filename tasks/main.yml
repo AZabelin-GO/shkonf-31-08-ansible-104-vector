@@ -19,8 +19,8 @@
   ansible.builtin.template:
     src: "vector.yaml.j2"
     dest: "/etc/vector/vector.yaml"
-    owner: "root"
-    group: "root"
+    owner: "vector"
+    group: "vector"
     mode: "0600"
   notify:
     - "Restart Vector"

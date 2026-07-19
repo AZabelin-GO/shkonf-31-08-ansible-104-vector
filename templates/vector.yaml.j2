@@ -24,6 +24,3 @@ sinks:
     endpoint: "{{ clickhouse_url }}"
     database: "{{ clickhouse_db_name }}"
     table: "{{ clickhouse_table_name }}"
-    skip_unexpected_fields: true
-    healthcheck:
-      enabled: false
