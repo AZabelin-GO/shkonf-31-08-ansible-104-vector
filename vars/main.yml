@@ -1,0 +1,10 @@
+#SPDX-License-Identifier: MIT-0
+---
+vector_major_version: 0
+vector_dist_channel: "stable"
+
+apt_vector_repository_url: "https://apt.vector.dev/"
+apt_vector_gpg_key_url: "https://keys.datadoghq.com/DATADOG_APT_KEY_CURRENT.public"
+
+apt_vector_packages:
+  - "vector"

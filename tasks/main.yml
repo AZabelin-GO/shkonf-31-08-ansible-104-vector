@@ -1,0 +1,11 @@
+#SPDX-License-Identifier: MIT-0
+---
+- name: "Add Vector repository via DEB822"
+  ansible.builtin.deb822_repository:
+    name: "vector"
+    types: ["deb"]
+    uris: ["{{ vector_apt_repository_url }}"]
+    suites: ["{{ vector_dist_channel }}"]
+    components: ["vector-{{ vector_major_version }}"]
+    signed_by: "{{ vector_apt_gpg_key_url }}"
+
