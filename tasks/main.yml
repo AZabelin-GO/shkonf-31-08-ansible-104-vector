@@ -1,6 +1,6 @@
 #SPDX-License-Identifier: MIT-0
 ---
-- name: "Add Vector repository via DEB822"
+- name: "Add Vector repository"
   ansible.builtin.deb822_repository:
     name: "vector"
     types: ["deb"]
@@ -9,3 +9,24 @@
     components: ["vector-{{ vector_major_version }}"]
     signed_by: "{{ apt_vector_gpg_key_url }}"
 
+- name: "Install Vector packages"
+  ansible.builtin.apt:
+    pkg: "{{ apt_vector_packages }}"
+    state: "present"
+    update_cache: true
+
+- name: "Add config for Vector"
+  ansible.builtin.template:
+    src: "vector.yaml.j2"
+    dest: "/etc/vector/vector.yaml"
+    owner: "root"
+    group: "root"
+    mode: "0600"
+  notify:
+    - "Restart Vector"
+
+- name: "Ensure Vector service is enabled and started"
+  ansible.builtin.systemd:
+    name: "vector"
+    state: "started"
+    enabled: true

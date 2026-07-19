@@ -1,0 +1,29 @@
+---
+sources:
+  demo_logs:
+    type: "demo_logs"
+    format: "json"
+    interval_ms: 500
+
+transforms:
+  parse_logs:
+    type: "remap"
+    inputs: ["demo_logs"]
+    source: |
+      .message = string!(.message)
+      .timestamp = parse_timestamp!(.timestamp, format: "%Y-%m-%dT%H:%M:%S.%fZ")
+
+sinks:
+  to_clickhouse:
+    type: "clickhouse"
+    auth:
+      strategy: "basic"
+      user: "{{ clickhouse_user }}"
+      password: "{{ clickhouse_password }}"
+    inputs: ["parse_logs"]
+    endpoint: "{{ clickhouse_url }}"
+    database: "{{ clickhouse_db_name }}"
+    table: "{{ clickhouse_table_name }}"
+    skip_unexpected_fields: true
+    healthcheck:
+      enabled: false

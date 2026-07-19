@@ -1,3 +1,7 @@
 #SPDX-License-Identifier: MIT-0
 ---
-# defaults file for .
+clickhouse_url: "http://clickhouse:8123"
+clickhouse_db_name: "vector"
+clickhouse_table_name: "logs"
+clickhouse_user: "vector"
+clickhouse_password: "vector"

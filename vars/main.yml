@@ -7,4 +7,4 @@ apt_vector_repository_url: "https://apt.vector.dev/"
 apt_vector_gpg_key_url: "https://keys.datadoghq.com/DATADOG_APT_KEY_CURRENT.public"
 
 apt_vector_packages:
-  - "vector"
+  - "vector=0.57.0-1"
