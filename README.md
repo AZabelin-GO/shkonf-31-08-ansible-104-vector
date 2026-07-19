@@ -1,38 +1,77 @@
-Role Name
-=========
+# Vector Role
 
-A brief description of the role goes here.
+Simple Ansible role to install Vector (observability data collector) on Debian/Ubuntu systems and configure a demo `demo_logs` source that forwards events to ClickHouse.
 
-Requirements
-------------
+## What it does
 
-Any pre-requisites that may not be covered by Ansible itself or the role should be mentioned here. For instance, if the role uses the EC2 module, it may be a good idea to mention in this section that the boto package is required.
+- Adds the Vector APT repository and GPG key.
+- Installs the configured Vector package(s).
+- Installs `/etc/vector/vector.yaml` from `templates/vector.yaml.j2` using role variables.
+- Ensures the `vector` systemd service is enabled and restarted when the config changes.
 
-Role Variables
---------------
+## Supported platforms
 
-A description of the settable variables for this role should go here, including any variables that are in defaults/main.yml, vars/main.yml, and any variables that can/should be set via parameters to the role. Any variables that are read from other roles and/or the global scope (ie. hostvars, group vars, etc.) should be mentioned here as well.
+- Debian / Ubuntu (APT-based systems with systemd)
 
-Dependencies
-------------
+## Requirements**
 
-A list of other roles hosted on Galaxy should go here, plus any details in regards to parameters that may need to be set for other roles, or variables that are used from other roles.
+- Network access to `{{ apt_vector_repository_url }}` to download packages.
+- `systemd` on the target host (role manages the `vector` systemd unit).
+- ClickHouse reachable from the host if you intend to use the bundled ClickHouse sink in the template.
 
-Example Playbook
-----------------
+## Variables
 
-Including an example of how to use your role (for instance, with variables passed in as parameters) is always nice for users too:
+The following variables are provided by this role (defaults in `defaults/main.yml` and `vars/main.yml`):
 
-    - hosts: servers
-      roles:
-         - { role: username.rolename, x: 42 }
+- `clickhouse_url` (default: `http://clickhouse:8123`) — ClickHouse HTTP endpoint used by the `clickhouse` sink.
+- `clickhouse_db_name` (default: `vector`) — ClickHouse database name.
+- `clickhouse_table_name` (default: `logs`) — ClickHouse table name to write events to.
+- `clickhouse_user` (default: `vector`) — ClickHouse basic auth user.
+- `clickhouse_password` (default: `vector`) — ClickHouse basic auth password.
 
-License
--------
+- `vector_major_version` (default: `0`) — Major version used in the APT component naming.
+- `vector_dist_channel` (default: `stable`) — Repository suite/channel (e.g. `stable`).
+- `apt_vector_repository_url` (default: `https://apt.vector.dev/`) — APT repo base URL used to add the Vector repository.
+- `apt_vector_gpg_key_url` (default: `https://keys.datadoghq.com/DATADOG_APT_KEY_CURRENT.public`) — URL to the GPG key used to sign the Vector packages.
+- `apt_vector_packages` (default: `['vector=0.57.0-1']`) — List of packages (and versions) to install. Pin or change the version as needed.
 
-BSD
+All variables are defined in `defaults/main.yml` and `vars/main.yml`, and can be overridden in your playbook, inventory, or group/host vars.
 
-Author Information
-------------------
+## Files and templates
 
-An optional section for the role authors to include contact information, or a website (HTML is not allowed).
+- Template: [templates/vector.yaml.j2](templates/vector.yaml.j2) — role provides a ready-to-use Vector config using a `demo_logs` source and a ClickHouse sink.
+- Tasks: [tasks/main.yml](tasks/main.yml) — repository setup, package install, config template, and systemd service management.
+- Handlers: [handlers/main.yml](handlers/main.yml) — restarts the `vector` service when config changes.
+
+## Dependencies
+
+- None.
+
+## Example Playbook
+
+Overwrite defaults as needed, for example to point at an external ClickHouse instance:
+
+```yaml
+- hosts: monitoring
+  become: true
+  roles:
+    - role: vector
+      vars:
+        clickhouse_url: "http://clickhouse.example.local:8123"
+        clickhouse_user: "vector_user"
+        clickhouse_password: "s3cret"
+```
+
+## Notes and recommendations
+
+- The provided `templates/vector.yaml.j2` uses the `demo_logs` source (useful for testing). Replace or extend sources/sinks for production use.
+- The role pins the Vector package in `vars/main.yml` — update the pinned version carefully when upgrading.
+- Ensure ClickHouse is reachable and configured with the expected database/table or modify the template to match your ClickHouse schema/setup.
+
+## License
+
+MIT
+
+## Author Information
+
+Role author: AZabelin
