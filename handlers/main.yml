@@ -4,3 +4,4 @@
   ansible.builtin.systemd:
     name: "vector"
     state: "restarted"
+  when: "'molecule-notest' not in ansible_skip_tags"

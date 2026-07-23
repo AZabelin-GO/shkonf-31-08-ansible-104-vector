@@ -3,6 +3,8 @@ galaxy_info:
   author: AZabelin
   description: Simple role to install Vector and setup demo_logs generator with Clickhouse as storage
   company: Homelab
+  role_name: vector
+  namespace: azabelin
   license: MIT
   min_ansible_version: "2.2"
   galaxy_tags:

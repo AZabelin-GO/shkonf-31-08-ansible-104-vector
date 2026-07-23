@@ -1,0 +1,37 @@
+---
+- name: Verify
+  hosts: all
+  tasks:
+    - name: Check Vector binary status
+      ansible.builtin.command: vector --version
+      register: vector_version_cmd
+      changed_when: false
+
+    - name: Assert Vector binary is executable
+      ansible.builtin.assert:
+        that:
+          - vector_version_cmd.rc == 0
+          - "'vector' in vector_version_cmd.stdout"
+        fail_msg: "Vector binary is not working or not installed!"
+
+    - name: Check Vector configuration file
+      ansible.builtin.stat:
+        path: /etc/vector/vector.yaml
+      register: vector_config
+
+    - name: Assert configuration file exists and has 0600 mode
+      ansible.builtin.assert:
+        that:
+          - vector_config.stat.exists
+          - vector_config.stat.mode == '0600'
+        fail_msg: "Vector config file is missing or has invalid permissions!"
+
+    - name: Validate Vector configuration syntax
+      ansible.builtin.command: "vector validate --skip-healthchecks /etc/vector/vector.yaml"
+      register: vector_validate
+      changed_when: false
+
+    - name: Assert Vector config is valid
+      ansible.builtin.assert:
+        that:
+          - vector_validate.rc == 0

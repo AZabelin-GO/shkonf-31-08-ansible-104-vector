@@ -30,3 +30,4 @@
     name: "vector"
     state: "started"
     enabled: true
+  when: "'molecule-notest' not in ansible_skip_tags"
